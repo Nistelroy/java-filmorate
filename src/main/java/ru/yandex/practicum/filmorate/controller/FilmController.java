@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,11 +23,10 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     private List<Film> films = new ArrayList<>();
-    private int id;
+    private static int id;
 
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
-
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
@@ -44,10 +42,9 @@ public class FilmController {
 
     @PutMapping
     public ResponseEntity<Film> updateFilm(@RequestBody Film updatedFilm) {
-
         for (Film film : films) {
             if (film.getId() == updatedFilm.getId()) {
-                log.info("замена фильма {} на обновлённый: {}",film, updatedFilm);
+                log.info("замена фильма {} на обновлённый: {}", film, updatedFilm);
                 updatedFilm.setId(film.getId());
                 films.remove(film);
                 films.add(updatedFilm);

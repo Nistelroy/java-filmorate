@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,18 +18,15 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
     private List<User> users = new ArrayList<>();
-    private int id;
+    private static int id;
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-
-
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
@@ -59,9 +55,7 @@ public class UserController {
         }
         log.error("Ошибка обновления юзера {}", updatedUser);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedUser);
-
     }
-
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
