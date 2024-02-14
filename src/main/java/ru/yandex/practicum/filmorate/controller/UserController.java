@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,8 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @RestController
 @RequestMapping("/users")
 @Slf4j

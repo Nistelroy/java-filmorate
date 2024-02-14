@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @RestController
 @RequestMapping("/films")
 @Slf4j
@@ -27,13 +31,15 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
-            log.error("Ошибка валидации фильма : {}", errorMessage);
-            return ResponseEntity.badRequest().body(film);
+
+            if (bindingResult.hasErrors()) {
+                StringBuilder errorMessage = new StringBuilder();
+                bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
+                log.error("Ошибка валидации фильма : {}", errorMessage);
+                return ResponseEntity.badRequest().body(film);
 //            throw new ValidationException(errorMessage.toString());
-        }
+            }
+
         film.setId(getId());
         log.info("создание фильма: {}", film);
         films.add(film);
