@@ -1,79 +1,61 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Getter
-@Setter
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private List<Film> films = new ArrayList<>();
-    private static int id;
+    private Map<Integer, Film> filmMap = new HashMap<>();
+    private int id;
 
     @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
-
-            if (bindingResult.hasErrors()) {
-                StringBuilder errorMessage = new StringBuilder();
-                bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
-                log.error("Ошибка валидации фильма : {}", errorMessage);
-                return ResponseEntity.badRequest().body(film);
-//            throw new ValidationException(errorMessage.toString());
-            }
-
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film addFilm(@Valid @RequestBody Film film) {
         film.setId(getId());
         log.info("создание фильма: {}", film);
-        films.add(film);
-        return new ResponseEntity<>(film, HttpStatus.CREATED);
+        filmMap.put(film.getId(), film);
+        return film;
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@RequestBody Film updatedFilm) {
-        for (Film film : films) {
-            if (film.getId() == updatedFilm.getId()) {
-                log.info("замена фильма {} на обновлённый: {}", film, updatedFilm);
-                updatedFilm.setId(film.getId());
-                films.remove(film);
-                films.add(updatedFilm);
-                return ResponseEntity.ok(updatedFilm);
-            }
+    @ResponseStatus(HttpStatus.OK)
+    public Film updateFilm(@RequestBody Film updatedFilm) {
+        if (filmMap.get(updatedFilm.getId()) != null) {
+            log.info("замена фильма {} на обновлённый: {}", filmMap.get(updatedFilm.getId()), updatedFilm);
+            filmMap.put(updatedFilm.getId(), updatedFilm);
+            return updatedFilm;
+        } else {
+            log.error("Ошибка обновления фильма {}", updatedFilm);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
-        log.error("Ошибка обновления фильма {}", updatedFilm);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedFilm);
     }
 
     @GetMapping
-    public ResponseEntity<List<Film>> getAllFilms() {
-        log.info("запрос всех юзеров {}", films.toString());
-        return new ResponseEntity<>(films, HttpStatus.OK);
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getAllFilms() {
+        List<Film> films = new ArrayList<>(filmMap.values());
+        log.info("запрос всех фильмов {}", films.toString());
+        return films;
     }
 
     private int getId() {
-        id += 1;
-        return id;
+        return ++id;
     }
 }

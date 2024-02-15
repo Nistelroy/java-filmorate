@@ -15,7 +15,10 @@ import java.lang.annotation.Target;
 public @interface ValidReleaseDate {
     String message() default "дата релиза — не раньше 28 декабря 1895 года";
 
+    String value() default "1895-12-28";
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }
+

@@ -5,17 +5,17 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
 public class ReleaseDateValidator implements ConstraintValidator<ValidReleaseDate, LocalDate> {
-    private static final LocalDate EARLIEST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private LocalDate firstReleaseDate;
 
     @Override
     public void initialize(ValidReleaseDate constraintAnnotation) {
+        ConstraintValidator.super.initialize(constraintAnnotation);
+        firstReleaseDate = LocalDate.parse(constraintAnnotation.value());
     }
 
     @Override
     public boolean isValid(LocalDate releaseDate, ConstraintValidatorContext context) {
-        if (releaseDate == null) {
-            return true;
-        }
-        return releaseDate.isEqual(EARLIEST_RELEASE_DATE) || releaseDate.isAfter(EARLIEST_RELEASE_DATE);
+        return releaseDate == null || !releaseDate.isBefore(firstReleaseDate);
     }
 }
+

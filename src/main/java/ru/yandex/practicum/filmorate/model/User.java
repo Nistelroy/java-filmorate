@@ -28,9 +28,9 @@ public class User {
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    public String getName() {
+    public void setNameFromLogin() {
         if (name == null) {
-            return login;
-        } else return name;
+            name = login;
+        }
     }
 }

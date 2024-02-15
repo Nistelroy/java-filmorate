@@ -1,79 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Getter
-@Setter
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private List<User> users = new ArrayList<>();
-    private static int id;
+    private Map<Integer, User> userMap = new HashMap<>();
+    private int id;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
-            log.error("Ошибка валидации юзера: {}", errorMessage);
-
-            return ResponseEntity.badRequest().body(user);
-//            throw new ValidationException(errorMessage.toString());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@Valid @RequestBody User user) {
         user.setId(getId());
+        user.setNameFromLogin();
         log.info("создание юзера: {}", user);
-        users.add(user);
+        userMap.put(user.getId(), user);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return user;
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User updatedUser) {
-
-        for (User user : users) {
-            if (user.getId() == updatedUser.getId()) {
-                log.info("замена юзера {} на обновлённого: {}", user, updatedUser);
-                users.remove(user);
-                users.add(updatedUser);
-                return ResponseEntity.ok(updatedUser);
-            }
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUser(@RequestBody User updatedUser) {
+        if (userMap.get(updatedUser.getId()) != null) {
+            log.info("замена юзера {} на обновлённого: {}", userMap.get(updatedUser.getId()), updatedUser);
+            userMap.put(updatedUser.getId(), updatedUser);
+            return updatedUser;
+        } else {
+            log.error("Ошибка обновления юзера {}", updatedUser);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
-        log.error("Ошибка обновления юзера {}", updatedUser);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedUser);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        log.info("запрос всех юзеров {}", users.toString());
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getAllUsers() {
+        List<User> userList = new ArrayList<>(userMap.values());
+        log.info("запрос всех юзеров {}", userList.toString());
+        return userList;
     }
 
     private int getId() {
-        id += 1;
-        return id;
+        return ++id;
     }
 }
