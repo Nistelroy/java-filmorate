@@ -38,7 +38,7 @@ public class FilmController {
     public Film updateFilm(@RequestBody Film updatedFilm) {
         if (filmMap.get(updatedFilm.getId()) == null) {
             log.error("Ошибка обновления фильма {}", updatedFilm);
-            throw new FilmNotFoundException("Фильм не найден");
+            throw new FilmNotFoundException("Фильм не найден", updatedFilm);
         }
         log.info("замена фильма {} на обновлённый: {}", filmMap.get(updatedFilm.getId()), updatedFilm);
         filmMap.put(updatedFilm.getId(), updatedFilm);

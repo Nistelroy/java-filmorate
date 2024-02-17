@@ -40,7 +40,7 @@ public class UserController {
     public User updateUser(@RequestBody User updatedUser) {
         if (userMap.get(updatedUser.getId()) == null) {
             log.error("Ошибка обновления фильма {}", updatedUser);
-            throw new UserNotFoundException("Пользователь не найден");
+            throw new UserNotFoundException("Пользователь не найден", updatedUser);
         }
         log.info("Замена фильма {} на обновлённый: {}", userMap.get(updatedUser.getId()), updatedUser);
         userMap.put(updatedUser.getId(), updatedUser);
