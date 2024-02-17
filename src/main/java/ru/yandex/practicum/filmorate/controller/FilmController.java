@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
@@ -35,20 +35,17 @@ public class FilmController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     public Film updateFilm(@RequestBody Film updatedFilm) {
-        if (filmMap.get(updatedFilm.getId()) != null) {
-            log.info("замена фильма {} на обновлённый: {}", filmMap.get(updatedFilm.getId()), updatedFilm);
-            filmMap.put(updatedFilm.getId(), updatedFilm);
-            return updatedFilm;
-        } else {
+        if (filmMap.get(updatedFilm.getId()) == null) {
             log.error("Ошибка обновления фильма {}", updatedFilm);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
+            throw new FilmNotFoundException("Фильм не найден");
         }
+        log.info("замена фильма {} на обновлённый: {}", filmMap.get(updatedFilm.getId()), updatedFilm);
+        filmMap.put(updatedFilm.getId(), updatedFilm);
+        return updatedFilm;
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<Film> getAllFilms() {
         List<Film> films = new ArrayList<>(filmMap.values());
         log.info("запрос всех фильмов {}", films.toString());

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -37,20 +37,17 @@ public class UserController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     public User updateUser(@RequestBody User updatedUser) {
-        if (userMap.get(updatedUser.getId()) != null) {
-            log.info("замена юзера {} на обновлённого: {}", userMap.get(updatedUser.getId()), updatedUser);
-            userMap.put(updatedUser.getId(), updatedUser);
-            return updatedUser;
-        } else {
-            log.error("Ошибка обновления юзера {}", updatedUser);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        if (userMap.get(updatedUser.getId()) == null) {
+            log.error("Ошибка обновления фильма {}", updatedUser);
+            throw new UserNotFoundException("Пользователь не найден");
         }
+        log.info("Замена фильма {} на обновлённый: {}", userMap.get(updatedUser.getId()), updatedUser);
+        userMap.put(updatedUser.getId(), updatedUser);
+        return updatedUser;
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>(userMap.values());
         log.info("запрос всех юзеров {}", userList.toString());
