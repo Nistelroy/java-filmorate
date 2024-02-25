@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -29,4 +31,13 @@ public class Film {
     @Positive(message = "продолжительность фильма должна быть положительной.")
     private int duration;
 
+    private Set<Integer> likes;
+
+    public void addLike(int userId) {
+        likes.add(userId);
+    }
+
+    public void removeLike(int userId) {
+        likes.remove(userId);
+    }
 }
