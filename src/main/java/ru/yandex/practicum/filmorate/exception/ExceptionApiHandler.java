@@ -26,4 +26,5 @@ public class ExceptionApiHandler {
     public User handleUserNotFoundException(UserNotFoundException ex) {
         return ex.getUser();
     }
+
 }

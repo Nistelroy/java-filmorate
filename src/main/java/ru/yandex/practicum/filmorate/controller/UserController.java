@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,35 +28,55 @@ import java.util.Map;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
-        return userStorage.createUser(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User updatedUser) {
         log.info("Обновление пользователя: {}", updatedUser);
-        return userStorage.updateUser(updatedUser);
+        return userService.updateUser(updatedUser);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable int id) {
         log.info("Удаление пользователя с ID: {}", id);
-        userStorage.deleteUser(id);
+        userService.deleteUser(id);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
         log.info("Запрос всех пользователей");
-        return new ArrayList<>(userStorage.getAllUsers());
+        return new ArrayList<>(userService.getAllUsers());
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable int id) {
+        return userService.getUserById(id);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> getFriends(@PathVariable int id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
     }
 }

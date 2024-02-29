@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,26 +20,34 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public User createUser(User user) {
+        return userStorage.createUser(user);
+    }
+
+    public User deleteUser(int id) {
+        return userStorage.deleteUser(id);
+    }
+
+    public User updateUser(User user) {
+        return userStorage.updateUser(user);
+    }
+
+    public User getUserById(int userId) {
+        return userStorage.getUserById(userId);
+    }
+
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
+
     public void addFriend(int userId, int friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-
-        user.addFriend(friend.getId());
-        friend.addFriend(user.getId());
-
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.getUserById(friendId).getFriends().add(userId);
+        userStorage.getUserById(userId).getFriends().add(friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-
-        user.removeFriend(friend.getId());
-        friend.removeFriend(user.getId());
-
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        userStorage.getUserById(friendId).getFriends().remove(userId);
+        userStorage.getUserById(userId).getFriends().remove(friendId);
     }
 
     public List<User> getCommonFriends(int userId1, int userId2) {
@@ -52,5 +61,16 @@ public class UserService {
                 .filter(user2Friends::contains)
                 .map(userStorage::getUserById)
                 .collect(Collectors.toList());
+    }
+
+    public Collection<User> getFriends(int userID) {
+        return
+                userStorage.getAllUsers()
+                        .get(userID)
+                        .getFriends()
+                        .stream()
+                        .map(userStorage::getUserById)
+                        .collect(Collectors.toList());
+
     }
 }

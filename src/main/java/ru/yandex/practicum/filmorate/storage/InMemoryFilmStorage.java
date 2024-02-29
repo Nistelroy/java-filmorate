@@ -37,33 +37,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(int id) {
+    public Film deleteFilm(int id) {
+        Film film = filmMap.get(id);
         filmMap.remove(id);
+        return film;
     }
 
     @Override
     public List<Film> getAllFilms() {
         return new ArrayList<>(filmMap.values());
-    }
-
-    @Override
-    public void likeFilm(int filmId, int userId) {
-        Film film = filmMap.get(filmId);
-        if (film != null) {
-            film.addLike(userId);
-        } else {
-            throw new FilmNotFoundException("Фильм не найден", null);
-        }
-    }
-
-    @Override
-    public void unlikeFilm(int filmId, int userId) {
-        Film film = filmMap.get(filmId);
-        if (film != null) {
-            film.removeLike(userId);
-        } else {
-            throw new FilmNotFoundException("Фильм не найден", null);
-        }
     }
 
     private int getId() {

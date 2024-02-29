@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -31,31 +32,12 @@ public class User {
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private Set<Integer> friends;
-
-    private Set<Integer> likedFilms;
+    @JsonIgnore
+    private Set<Integer> friends = new HashSet<>();
 
     public void setNameFromLogin() {
         if (name == null) {
             name = login;
         }
-    }
-
-    public void likeFilm(Film film) {
-        likedFilms.add(film.getId());
-        film.addLike(getId());
-    }
-
-    public void unlikeFilm(Film film) {
-        likedFilms.remove(film.getId());
-        film.removeLike(getId());
-    }
-
-    public void addFriend(int friendId) {
-        friends.add(friendId);
-    }
-
-    public void removeFriend(int friendId) {
-        friends.remove(friendId);
     }
 }
