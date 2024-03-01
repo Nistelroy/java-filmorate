@@ -19,6 +19,7 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(getId());
         user.setNameFromLogin();
         userMap.put(user.getId(), user);
+
         return userMap.get(user.getId());
     }
 
@@ -27,6 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (userMap.get(userId) == null) {
             throw new ObjectNotFoundException("Юзер не существует");
         }
+
         return userMap.get(userId);
     }
 
@@ -34,6 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User updateUser(User updatedUser) {
         if (userMap.get(updatedUser.getId()) != null) {
             userMap.put(updatedUser.getId(), updatedUser);
+
             return updatedUser;
         } else {
             throw new ObjectNotFoundException("Юзер не существует");
@@ -44,6 +47,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User deleteUser(int id) {
         User user = userMap.get(id);
         userMap.remove(id);
+
         return user;
     }
 

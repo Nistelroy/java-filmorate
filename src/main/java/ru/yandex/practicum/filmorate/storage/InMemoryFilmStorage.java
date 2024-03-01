@@ -21,7 +21,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmMap.containsKey(film.getId())) {
             throw new InternalServiceException("Фильм уже существует");
         }
+
         filmMap.put(film.getId(), film);
+
         return film;
     }
 
@@ -29,6 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film updateFilm(Film updatedFilm) {
         if (filmMap.get(updatedFilm.getId()) != null) {
             filmMap.put(updatedFilm.getId(), updatedFilm);
+
             return updatedFilm;
         } else {
             throw new ObjectNotFoundException("Фильм не существует");
@@ -40,6 +43,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmMap.get(filmId) == null) {
             throw new ObjectNotFoundException("Фильм не существует");
         }
+
         return filmMap.get(filmId);
     }
 
@@ -47,6 +51,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film deleteFilm(int id) {
         Film film = filmMap.get(id);
         filmMap.remove(id);
+
         return film;
     }
 
