@@ -33,10 +33,10 @@ public class User {
     private LocalDate birthday;
 
     @JsonIgnore
-    private Set<Integer> friends = new HashSet<>();
+    private Set<Integer> friends;
 
     public void setNameFromLogin() {
-        if (name == null) {
+        if (name == null|| name.isEmpty()) {
             name = login;
         }
     }

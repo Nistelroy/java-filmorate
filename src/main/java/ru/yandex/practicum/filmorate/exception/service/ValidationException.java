@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exception;
+package ru.yandex.practicum.filmorate.exception.service;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
