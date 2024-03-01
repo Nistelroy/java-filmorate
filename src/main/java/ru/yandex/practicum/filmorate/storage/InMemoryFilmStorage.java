@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.storages.film.FilmAlreadyExistException;
-import ru.yandex.practicum.filmorate.exception.storages.film.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.InternalServiceException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -10,20 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static ru.yandex.practicum.filmorate.exception.storages.film.FilmAlreadyExistException.FILM_ALREADY_EXISTS;
-import static ru.yandex.practicum.filmorate.exception.storages.film.FilmNotFoundException.FILM_NOT_FOUND;
-
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private Map<Integer, Film> filmMap = new HashMap<>();
+    private final Map<Integer, Film> filmMap = new HashMap<>();
     private int id;
 
     @Override
     public Film addFilm(Film film) {
         film.setId(getId());
         if (filmMap.containsKey(film.getId())) {
-            throw new FilmAlreadyExistException(format(FILM_ALREADY_EXISTS, film.getId()));
+            throw new InternalServiceException("Фильм уже существует");
         }
         filmMap.put(film.getId(), film);
         return film;
@@ -35,14 +31,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             filmMap.put(updatedFilm.getId(), updatedFilm);
             return updatedFilm;
         } else {
-             throw new FilmNotFoundException(format(FILM_NOT_FOUND, updatedFilm.getId()));
+            throw new ObjectNotFoundException("Фильм не существует");
         }
     }
 
     @Override
     public Film getFilmById(int filmId) {
         if (filmMap.get(filmId) == null) {
-            throw new FilmNotFoundException(format(FILM_NOT_FOUND, filmId));
+            throw new ObjectNotFoundException("Фильм не существует");
         }
         return filmMap.get(filmId);
     }

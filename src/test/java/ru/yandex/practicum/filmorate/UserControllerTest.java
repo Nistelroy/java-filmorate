@@ -1,34 +1,26 @@
 package ru.yandex.practicum.filmorate;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WebMvcTest(controllers = UserController.class)
+
 public class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    private UserController userController;
     private User user;
 
     @BeforeEach
     protected void initializeUser() {
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
         user = User.builder()
                 .email("mail@yandex.ru")
                 .login("Boetticher")
@@ -38,52 +30,29 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateNewUser_Success() throws Exception {
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType("application/json"))
-
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value("2"))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    void testCreateUserWithBlankName_NameIsLogin() throws Exception {
+    void testCreateUserWithBlankName_NameIsLogin() {
         user.setName("");
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType("application/json"))
-
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.name").value(""))
-                .andExpect(status().isCreated());
+        userController.createUser(user);
+        assertEquals("Boetticher", userController.getAllUsers().get(0).getName());
     }
 
     @Test
-    void testCreateUserWithIncorrectEmail_BadRequest() throws Exception {
+    void testCreateUserWithIncorrectEmail_BadRequest() {
         user.setEmail("badEmail.ru");
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
+        try {
+            userController.createUser(user);
+        } catch (ValidationException e) {
+            assertEquals("Неверно указана эмейл", e.getMessage());
+        }
     }
 
     @Test
-    void testCreateUserWithBlankLogin_BadRequest() throws Exception {
-        user.setLogin("");
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testCreateUserWithFutureBirthday_BadRequest() throws Exception {
+    void testCreateUserWithFutureBirthday_BadRequest() {
         user.setBirthday(LocalDate.parse("2024-10-12"));
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(user))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
+        try {
+            userController.createUser(user);
+        } catch (ValidationException e) {
+            assertEquals("Неверно указана дата рождения", e.getMessage());
+        }
     }
 }

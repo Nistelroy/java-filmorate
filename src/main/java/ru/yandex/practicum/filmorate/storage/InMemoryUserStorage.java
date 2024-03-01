@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.storages.user.UserAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exception.storages.user.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -10,22 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static ru.yandex.practicum.filmorate.exception.storages.user.UserAlreadyExistsException.USER_ALREADY_EXISTS;
-import static ru.yandex.practicum.filmorate.exception.storages.user.UserNotFoundException.USER_NOT_FOUND;
-
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private Map<Integer, User> userMap = new HashMap<>();
+    private final Map<Integer, User> userMap = new HashMap<>();
     private int id = 0;
 
     @Override
     public User createUser(User user) {
         user.setId(getId());
         user.setNameFromLogin();
-        if (userMap.get(user.getId()) != null) {
-            throw new UserAlreadyExistsException(format(USER_ALREADY_EXISTS, user.getId()));
-        }
         userMap.put(user.getId(), user);
         return userMap.get(user.getId());
     }
@@ -33,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(int userId) {
         if (userMap.get(userId) == null) {
-            throw new UserNotFoundException(format(USER_NOT_FOUND, userId));
+            throw new ObjectNotFoundException("Юзер не существует");
         }
         return userMap.get(userId);
     }
@@ -44,7 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
             userMap.put(updatedUser.getId(), updatedUser);
             return updatedUser;
         } else {
-            throw new UserNotFoundException(format(USER_NOT_FOUND, updatedUser.getId()));
+            throw new ObjectNotFoundException("Юзер не существует");
         }
     }
 
