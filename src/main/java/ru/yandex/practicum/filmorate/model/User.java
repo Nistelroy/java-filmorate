@@ -33,7 +33,7 @@ public class User {
     private final Set<Integer> friends = new HashSet<>();
 
     public void setNameFromLogin() {
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.isBlank()) {
             name = login;
         }
     }

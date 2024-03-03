@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Data
 public class FilmService {
     private final FilmStorage filmStorage;
 

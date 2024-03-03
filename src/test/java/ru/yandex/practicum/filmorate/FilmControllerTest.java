@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class FilmControllerTest {
     private FilmStorage filmStorage;
     private FilmController filmController;
@@ -38,31 +40,19 @@ public class FilmControllerTest {
     @Test
     void testCreateFilmWithFutureReleaseDate_Success() {
         film.setReleaseDate(LocalDate.of(2026, 12, 9));
-        try {
-            filmController.addFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Некорректно указана дата релиза.", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     void testCreateFilmWithBlankName_BadRequest() {
         film.setName("");
-        try {
-            filmController.addFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Некорректно указано название фильма.", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     void testCreateFilmWithReleaseDateBeforeFirstFilmDate_BadRequest() {
         film.setReleaseDate(LocalDate.of(1685, 12, 12));
-        try {
-            filmController.addFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Некорректно указана дата релиза.", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
@@ -71,10 +61,6 @@ public class FilmControllerTest {
                 "----------------------------------------------------------------------------------------------" +
                 "-----------------------------------------------------------------------------------------------" +
                 "----------------------------------------------------------------------------------------------");
-        try {
-            filmController.addFilm(film);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Превышено количество символов в описании фильма.", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 }

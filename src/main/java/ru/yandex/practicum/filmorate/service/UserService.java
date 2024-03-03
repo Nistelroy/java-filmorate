@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.InternalServiceException;
+import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Data
 public class UserService {
 
     private final UserStorage userStorage;
@@ -46,7 +45,7 @@ public class UserService {
 
     public void addFriends(int userId, int friendId) {
         if (userId == friendId) {
-            throw new InternalServiceException("Нельзя добавить в друзья себя");
+            throw new ConflictException("Нельзя добавить в друзья себя");
         }
         if (userStorage.getUserById(userId) == null) {
             throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
@@ -60,7 +59,7 @@ public class UserService {
 
     public void removeFriend(int userId, int friendId) {
         if (userId == friendId) {
-            throw new InternalServiceException("Нельзя удалить из друзей себя");
+            throw new ConflictException("Нельзя удалить из друзей себя");
         }
         if (userStorage.getUserById(userId) == null) {
             throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
@@ -83,19 +82,18 @@ public class UserService {
         User user1 = userStorage.getUserById(userId);
         User user2 = userStorage.getUserById(friendId);
 
-        Set<Integer> user1Friends = user1.getFriends();
+        Set<Integer> user1Friends = new HashSet<>(user1.getFriends());
         Set<Integer> user2Friends = user2.getFriends();
 
-        if (user1Friends.stream().anyMatch(user2Friends::contains)) {
+        user1Friends.retainAll(user2Friends);
+
+        if (user1Friends.isEmpty()) {
+            return new ArrayList<>();
+        } else {
             return user1Friends.stream()
-                    .filter(user1Friends::contains)
-                    .filter(user2Friends::contains)
                     .map(userStorage::getUserById)
                     .collect(Collectors.toList());
-        } else {
-            return new ArrayList<>();
         }
-
     }
 
     public List<User> getFriends(int userId) {

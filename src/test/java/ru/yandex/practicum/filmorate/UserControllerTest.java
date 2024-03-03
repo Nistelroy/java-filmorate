@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class UserControllerTest {
@@ -39,20 +40,12 @@ public class UserControllerTest {
     @Test
     void testCreateUserWithIncorrectEmail_BadRequest() {
         user.setEmail("badEmail.ru");
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            assertEquals("Неверно указана эмейл", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> userController.createUser(user));
     }
 
     @Test
     void testCreateUserWithFutureBirthday_BadRequest() {
         user.setBirthday(LocalDate.parse("2024-10-12"));
-        try {
-            userController.createUser(user);
-        } catch (ValidationException e) {
-            assertEquals("Неверно указана дата рождения", e.getMessage());
-        }
+        assertThrows(ValidationException.class, () -> userController.createUser(user));
     }
 }

@@ -11,9 +11,9 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
-@Slf4j
 public class FilmController {
     private final FilmService filmService;
 

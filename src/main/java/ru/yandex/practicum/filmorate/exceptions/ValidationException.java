@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
-public class ValidationException extends IllegalArgumentException {
+public class ValidationException extends RuntimeException {
     public ValidationException(final String text) {
         super(text);
     }
