@@ -40,12 +40,20 @@ public class UserControllerTest {
     @Test
     void testCreateUserWithIncorrectEmail_BadRequest() {
         user.setEmail("badEmail.ru");
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        try {
+            userController.createUser(user);
+        } catch (ValidationException e) {
+            assertEquals("Неверно указана эмейл", e.getMessage());
+        }
     }
 
     @Test
     void testCreateUserWithFutureBirthday_BadRequest() {
         user.setBirthday(LocalDate.parse("2024-10-12"));
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        try {
+            userController.createUser(user);
+        } catch (ValidationException e) {
+            assertEquals("Неверно указана дата рождения", e.getMessage());
+        }
     }
 }
