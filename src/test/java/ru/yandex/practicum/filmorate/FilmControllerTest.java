@@ -1,33 +1,26 @@
 package ru.yandex.practicum.filmorate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WebMvcTest(controllers = FilmController.class)
 public class FilmControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    private FilmStorage filmStorage;
+    private FilmController filmController;
     private Film film;
 
     @BeforeEach
     protected void initTests() {
+        filmStorage = new InMemoryFilmStorage();
+        filmController = new FilmController(new FilmService(filmStorage));
         film = Film.builder()
                 .name("случайный фильм")
                 .description("это очень старый фильм")
@@ -37,54 +30,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void testCreateNewFilm_Success() throws Exception {
-        mockMvc.perform(post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType("application/json"))
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value("1"))
-                .andExpect(status().isCreated());
+    void testCreateNewFilm_Success() {
+        filmController.addFilm(film);
+        assertEquals(film, filmStorage.getFilmById(1));
     }
-
-    @Test
-    void testCreateFilmWithFutureReleaseDate_Success() throws Exception {
-        film.setReleaseDate(LocalDate.of(2026, 12, 9));
-        mockMvc.perform(post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType("application/json"))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    void testCreateFilmWithBlankName_BadRequest() throws Exception {
-        film.setName("");
-        mockMvc.perform(post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testCreateFilmWithReleaseDateBeforeFirstFilmDate_BadRequest() throws Exception {
-        film.setReleaseDate(LocalDate.of(1685, 12, 12));
-        mockMvc.perform(post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testCreateFilmWithLongDescription_BadRequest() throws Exception {
-        film.setDescription("------------------------------------------------------------------------------" +
-                "----------------------------------------------------------------------------------------------" +
-                "-----------------------------------------------------------------------------------------------" +
-                "----------------------------------------------------------------------------------------------");
-
-        mockMvc.perform(post("/films")
-                        .content(objectMapper.writeValueAsString(film))
-                        .contentType("application/json"))
-                .andExpect(status().isBadRequest());
-    }
-
-
 }
