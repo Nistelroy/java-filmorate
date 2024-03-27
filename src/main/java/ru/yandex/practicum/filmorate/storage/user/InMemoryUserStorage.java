@@ -6,9 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -64,7 +62,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int userId, int friendId){
+    public void addFriend(int userId, int friendId) {
         Optional<User> userOptional = getUserById(userId);
         Optional<User> friendOptional = getUserById(friendId);
         userOptional.ifPresent(user -> user.addFriend(friendId));

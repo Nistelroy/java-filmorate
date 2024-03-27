@@ -26,7 +26,7 @@ public class Genre implements Comparable {
     @Override
     public int compareTo(Object o) {
         if (this == o || this.equals(o)) return 0;
-        if (this.getId() > ((Genre)o).getId()) return 1;
+        if (this.getId() > ((Genre) o).getId()) return 1;
         return -1;
     }
 }

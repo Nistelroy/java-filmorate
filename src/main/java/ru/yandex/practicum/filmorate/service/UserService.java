@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,7 +19,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User createUser(User user) {
+    public Optional<User> createUser(User user) {
         return userStorage.createUser(user);
     }
 
@@ -40,7 +39,7 @@ public class UserService {
         return foundUser;
     }
 
-    public List<User> getAllUsers() {
+    public Collection<User> getAllUsers() {
         return userStorage.getAllUsers();
     }
 
@@ -72,8 +71,17 @@ public class UserService {
 
     public Collection<User> getCommonFriends(int userId, int friendId) {
         return userStorage.getCommonFriends(userId, friendId);
-        }
+    }
 
+    public void confirmFriend(int userId, int friendId) {
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
+        }
+        if (userStorage.userNotExist(friendId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + friendId + " не найден.");
+        }
+        userStorage.confirmFriend(userId, friendId);
+    }
 
     public Collection<User> getFriends(int userId) {
         return userStorage.getFriends(userId);

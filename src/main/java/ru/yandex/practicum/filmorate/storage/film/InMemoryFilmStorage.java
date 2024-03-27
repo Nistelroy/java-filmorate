@@ -6,12 +6,9 @@ import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,13 +67,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(int id, int userId){
+    public void addLike(int id, int userId) {
         Optional<Film> film = getFilmById(id);
         film.get().addLike(userId);
     }
 
     @Override
-    public void removeLike(int id, int userId){
+    public void removeLike(int id, int userId) {
         Optional<Film> film = getFilmById(id);
         film.get().removeLike(userId);
     }
@@ -115,6 +112,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         return Optional.of(filmMap.get(id));
     }
+
     private int getId() {
         return ++id;
     }

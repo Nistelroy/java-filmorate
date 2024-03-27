@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
@@ -16,6 +15,7 @@ public interface FilmStorage {
     Collection<Film> getAllFilms();
 
     Optional<Film> getFilm(int id);
+
     boolean filmExist(int id);
 
     boolean filmNotExist(int id);
