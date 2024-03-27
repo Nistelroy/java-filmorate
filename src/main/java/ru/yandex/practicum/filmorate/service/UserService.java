@@ -1,25 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -27,16 +24,20 @@ public class UserService {
         return userStorage.createUser(user);
     }
 
-    public User deleteUser(int id) {
-        return userStorage.deleteUser(id);
-    }
 
-    public User updateUser(User user) {
+    public Optional<User> updateUser(User user) {
+        if (userStorage.userNotExist(user.getId())) {
+            throw new ObjectNotFoundException("Пользователь с id " + user.getId() + " не найден.");
+        }
         return userStorage.updateUser(user);
     }
 
-    public User getUserById(int userId) {
-        return userStorage.getUserById(userId);
+    public Optional<User> getUser(int userId) {
+        Optional<User> foundUser = userStorage.getUser(userId);
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
+        }
+        return foundUser;
     }
 
     public List<User> getAllUsers() {
@@ -47,67 +48,34 @@ public class UserService {
         if (userId == friendId) {
             throw new ConflictException("Нельзя добавить в друзья себя");
         }
-        if (userStorage.getUserById(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
         }
-        if (userStorage.getUserById(friendId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + friendId + " не существует");
+        if (userStorage.userNotExist(friendId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + friendId + " не найден.");
         }
-        userStorage.getUserById(friendId).addFriend(userId);
-        userStorage.getUserById(userId).addFriend(friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
         if (userId == friendId) {
             throw new ConflictException("Нельзя удалить из друзей себя");
         }
-        if (userStorage.getUserById(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
         }
-        if (userStorage.getUserById(friendId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + friendId + " не существует");
+        if (userStorage.userNotExist(friendId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + friendId + " не найден.");
         }
-        userStorage.getUserById(friendId).removeFriend(userId);
-        userStorage.getUserById(userId).removeFriend(friendId);
+        userStorage.removeFriend(userId, friendId);
     }
 
-    public List<User> getCommonFriends(int userId, int friendId) {
-        if (userStorage.getUserById(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
-        }
-        if (userStorage.getUserById(friendId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + friendId + " не существует");
+    public Collection<User> getCommonFriends(int userId, int friendId) {
+        return userStorage.getCommonFriends(userId, friendId);
         }
 
-        User user1 = userStorage.getUserById(userId);
-        User user2 = userStorage.getUserById(friendId);
 
-        Set<Integer> user1Friends = new HashSet<>(user1.getFriends());
-        Set<Integer> user2Friends = user2.getFriends();
-
-        user1Friends.retainAll(user2Friends);
-
-        if (user1Friends.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            return user1Friends.stream()
-                    .map(userStorage::getUserById)
-                    .collect(Collectors.toList());
-        }
-    }
-
-    public List<User> getFriends(int userId) {
-        if (userStorage.getUserById(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь с айди : " + userId + " не существует");
-        }
-        if (userStorage.getUserById(userId).getFriends().isEmpty()) {
-            throw new ObjectNotFoundException("У пользователя нет друзей");
-        }
-        return userStorage.getUserById(userId)
-                .getFriends()
-                .stream()
-                .map(userStorage::getUserById)
-                .collect(Collectors.toList());
-
+    public Collection<User> getFriends(int userId) {
+        return userStorage.getFriends(userId);
     }
 }

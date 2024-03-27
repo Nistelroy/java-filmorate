@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -24,13 +25,13 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film addFilm(@Valid @RequestBody Film film) {
+    public Optional<Film> addFilm(@Valid @RequestBody Film film) {
         log.info("Создание фильма: {}", film);
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film updatedFilm) {
+    public Optional<Film> updateFilm(@RequestBody Film updatedFilm) {
         log.info("Обновление фильма: {}", updatedFilm);
         return filmService.updateFilm(updatedFilm);
     }
@@ -40,16 +41,10 @@ public class FilmController {
         filmService.likeFilm(id, userId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteFilm(@PathVariable int id) {
-        log.info("Удаление фильма с ID: {}", id);
-        filmService.deleteFilmById(id);
-    }
-
 
     @GetMapping("/{id}")
-    public Film getFilm(@PathVariable int id) {
-        return filmService.getFilmById(id);
+    public Optional<Film> getFilm(@PathVariable int id) {
+        return filmService.getFilm(id);
     }
 
     @GetMapping("/popular")

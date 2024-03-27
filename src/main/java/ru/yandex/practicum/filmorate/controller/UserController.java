@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,21 +34,15 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@Valid @RequestBody User user) {
+    public Optional<User> createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
         return userService.createUser(user);
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User updatedUser) {
+    public Optional<User> updateUser(@RequestBody User updatedUser) {
         log.info("Обновление пользователя: {}", updatedUser);
         return userService.updateUser(updatedUser);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable int id) {
-        log.info("Удаление пользователя с ID: {}", id);
-        userService.deleteUser(id);
     }
 
     @GetMapping
@@ -69,6 +64,11 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);
+    }
+
+    @PutMapping("/{id}/friends/confirm/{friendId}")
+    public void confirmFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.confirmFriend(id, friendId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
