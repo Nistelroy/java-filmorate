@@ -49,16 +49,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User deleteUser(int id) {
-        User user = userMap.get(id);
-        userMap.remove(id);
-
-        return user;
-    }
-
-    @Override
     public Collection<User> getAllUsers() {
-        return userMap.values();;
+        return userMap.values();
     }
 
     @Override
@@ -95,8 +87,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Collection<User> getCommonFriends(int id, int otherId) {
-        Set<Long> friendsId = new HashSet<>(getUserById(id).get().getFriends());
-        Set<Long> otherFriendsId = getUserById(otherId).get().getFriends();
+        Set<Integer> friendsId = new HashSet<>(getUserById(id).get().getFriends());
+        Set<Integer> otherFriendsId = getUserById(otherId).get().getFriends();
 
         friendsId.retainAll(otherFriendsId);
         return getUsersByIds(friendsId);

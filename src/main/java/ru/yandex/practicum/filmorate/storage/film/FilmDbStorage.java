@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilms() {
+    public Collection<Film> getAllFilms() {
         String sqlQuery =
                 "select " +
                         "   films.film_id, " +
@@ -218,7 +219,7 @@ public class FilmDbStorage implements FilmStorage {
         return new HashSet<>(jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id));
     }
 
-    private Set<Long> getFilmLikes(int id) {
+    private Set<Integer> getFilmLikes(int id) {
         String sqlQuery =
                 "select " +
                         "   film_likes.user_id " +
@@ -259,7 +260,7 @@ public class FilmDbStorage implements FilmStorage {
                         resultSet.getString("mpa_name"),
                         resultSet.getString("mpa_description")))
                 .genres(getFilmGenres(resultSet.getInt("film_id")))
-                .like(getFilmLikes(resultSet.getInt("film_id")))
+                .likes(getFilmLikes(resultSet.getInt("film_id")))
                 .build();
     }
 

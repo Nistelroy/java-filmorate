@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,15 +35,15 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public Optional<Film> getFilmById(int filmId) {
-        Optional<Film> foundFilm = filmStorage.getFilmById(filmId);
+    public Optional<Film> getFilm(int filmId) {
+        Optional<Film> foundFilm = filmStorage.getFilm(filmId);
         if (foundFilm.isEmpty()) {
             throw new ObjectNotFoundException("Фильм с id " + filmId + " не найден.");
         }
         return foundFilm;
     }
 
-    public List<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() {
         return filmStorage.getAllFilms();
     }
 
@@ -53,17 +52,17 @@ public class FilmService {
     }
 
     public void likeFilm(int filmId, int userId) {
-        if (filmStorage.getFilmById(filmId) == null) {
+        if (filmStorage.getFilm(filmId).isEmpty()) {
             throw new ObjectNotFoundException("Фильм с айди'" + filmId + "' не найден");
         }
-        filmStorage.getFilmById(filmId).addLike(userId);
+        filmStorage.getFilm(filmId).get().addLike(userId);
     }
 
     public void unlikeFilm(int userId, int filmId) {
-        if (filmStorage.getFilmById(filmId) == null) {
+        if (filmStorage.getFilm(filmId).isEmpty()) {
             throw new ObjectNotFoundException("Фильм с айди'" + filmId + "' не найден");
         }
-        filmStorage.getFilmById(filmId).removeLike(userId);
+        filmStorage.getFilm(filmId).get().removeLike(userId);
     }
 
     public Collection<Mpa> getAllMpa() {

@@ -51,34 +51,21 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ObjectNotFoundException("Фильм не существует");
         }
 
-        return filmMap.get(filmId);
+        return Optional.of(filmMap.get(filmId));
     }
 
     @Override
-    public Film deleteFilm(int id) {
-        Film film = filmMap.get(id);
-        filmMap.remove(id);
-
-        return film;
-    }
-
-    @Override
-    public List<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() {
         return new ArrayList<>(filmMap.values());
     }
 
     @Override
-    public Collection<Film> getFilms() {
-        return filmMap.values();
-    }
-
-    @Override
-    public boolean filmExist(Long id) {
+    public boolean filmExist(int id) {
         return filmMap.containsKey(id);
     }
 
     @Override
-    public boolean filmNotExist(Long id) {
+    public boolean filmNotExist(int id) {
         return !filmMap.containsKey(id);
     }
 

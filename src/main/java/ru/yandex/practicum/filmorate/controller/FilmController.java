@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopularFilm(count);
     }
 

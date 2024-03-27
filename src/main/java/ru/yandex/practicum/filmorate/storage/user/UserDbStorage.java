@@ -150,7 +150,7 @@ public class UserDbStorage implements UserStorage {
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
-                .id(resultSet.getLong("user_id"))
+                .id(resultSet.getInt("user_id"))
                 .login(resultSet.getString("login"))
                 .email(resultSet.getString("email"))
                 .name(resultSet.getString("name"))

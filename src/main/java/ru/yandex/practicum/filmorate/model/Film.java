@@ -25,7 +25,7 @@ public class Film {
     @NotBlank(message = "описание не может быть пустым")
     @Size(max = 200, message = "максимальная длина описания — 200 символов")
     private String description;
-    private final Mpa mpa;
+    private Mpa mpa;
 
     @ValidReleaseDate
     @NotNull
@@ -34,8 +34,8 @@ public class Film {
     @Positive(message = "продолжительность фильма должна быть положительной.")
     private int duration;
 
-    private final Set<Integer> likes = new HashSet<>();
-    private final Set<Genre> genres;
+    private Set<Integer> likes;
+    private Set<Genre> genres;
 
     public void addLike(int userId) {
         likes.add(userId);
