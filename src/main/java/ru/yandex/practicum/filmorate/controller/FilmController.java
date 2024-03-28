@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Optional<Film> updateFilm(@RequestBody Film updatedFilm) {
+    public Optional<Film> updateFilm(@Valid @RequestBody Film updatedFilm) {
         log.info("Обновление фильма: {}", updatedFilm);
         return filmService.updateFilm(updatedFilm);
     }
@@ -54,7 +54,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<Film> getFilms() {
         log.info("Запрос всех фильмов");
         return new ArrayList<>(filmService.getAllFilms());
     }

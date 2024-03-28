@@ -201,6 +201,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void addGenreToFilm(int filmId, int genreId) {
+        if (!isGenreExists(genreId)) {
+            throw new RuntimeException("Genre с id " + genreId + " не найден");
+        }
         String sqlQuery = "merge into film_genres(film_id, genre_id) key(film_id, genre_id) values(?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
@@ -270,5 +273,13 @@ public class FilmDbStorage implements FilmStorage {
 
     private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
         return new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("name"), resultSet.getString("description"));
+    }
+
+    private boolean isGenreExists(int genreId) {
+        Integer i = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM genres WHERE genre_id = ?", Integer.class, genreId);
+        if (i != null) {
+            return i > 0;
+        }
+        return false;
     }
 }

@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PutMapping
-    public Optional<User> updateUser(@RequestBody User updatedUser) {
+    public Optional<User> updateUser(@Valid @RequestBody User updatedUser) {
         log.info("Обновление пользователя: {}", updatedUser);
         return userService.updateUser(updatedUser);
     }

@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
+import javax.validation.ValidationException;
+
 @RestControllerAdvice
 public class ErrorHandler {
     @ExceptionHandler

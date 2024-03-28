@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.validators.ValidReleaseDate;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -24,6 +25,7 @@ public class Film {
     @NotBlank(message = "описание не может быть пустым")
     @Size(max = 200, message = "максимальная длина описания — 200 символов")
     private String description;
+
     private Mpa mpa;
 
     @ValidReleaseDate
@@ -34,6 +36,7 @@ public class Film {
     private int duration;
 
     private Set<Integer> likes;
+
     private Set<Genre> genres;
 
     public void addLike(int userId) {

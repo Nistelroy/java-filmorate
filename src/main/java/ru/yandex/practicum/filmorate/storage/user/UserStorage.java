@@ -10,7 +10,6 @@ public interface UserStorage {
 
     Optional<User> updateUser(User updatedUser);
 
-
     Collection<User> getAllUsers();
 
     Optional<User> getUser(int id);

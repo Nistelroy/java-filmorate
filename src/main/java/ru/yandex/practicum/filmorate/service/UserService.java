@@ -70,11 +70,23 @@ public class UserService {
     }
 
     public Collection<User> getCommonFriends(int userId, int friendId) {
+        if (userId == friendId) {
+            throw new ConflictException("Нельзя");
+        }
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
+        }
+        if (userStorage.userNotExist(friendId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + friendId + " не найден.");
+        }
         return userStorage.getCommonFriends(userId, friendId);
     }
 
     public void confirmFriend(int userId, int friendId) {
-        if (userStorage.userNotExist(userId)) {
+        if (userId == friendId) {
+            throw new ConflictException("Нельзя");
+        }
+        else if (userStorage.userNotExist(userId)) {
             throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
         }
         if (userStorage.userNotExist(friendId)) {
@@ -84,6 +96,9 @@ public class UserService {
     }
 
     public Collection<User> getFriends(int userId) {
+        if (userStorage.userNotExist(userId)) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
+        }
         return userStorage.getFriends(userId);
     }
 }
