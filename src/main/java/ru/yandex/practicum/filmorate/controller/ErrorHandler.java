@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.ConflictException;
+import ru.yandex.practicum.filmorate.exceptions.InvalidDataException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
-
-import javax.validation.ValidationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -24,4 +23,9 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
+    @ExceptionHandler(InvalidDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidDataException(final InvalidDataException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
 }

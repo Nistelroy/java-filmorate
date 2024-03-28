@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.InvalidDataException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -28,6 +29,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> addFilm(Film film) {
+        Optional<Mpa> mpa = getMpaById(film.getMpa().getId());
+        if (mpa.isEmpty()) {
+            throw new InvalidDataException("Недействительный MPA указан для фильма.");
+        }
+
+
         Map<String, Object> filmMap = film.toMap();
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
@@ -38,6 +45,12 @@ public class FilmDbStorage implements FilmStorage {
 
         Set<Genre> genres = film.getGenres();
         if (genres != null) {
+            for (Genre genre : film.getGenres()) {
+            Optional<Genre> existingGenre = getGenreById(genre.getId());
+            if (existingGenre.isEmpty()) {
+                throw new InvalidDataException("Недействительный жанр указан для фильма: " + genre.getId());
+            }
+        }
             genres = new HashSet<>(genres.stream().sorted(Genre::compareTo).collect(
                     Collectors.toCollection(LinkedHashSet::new)));
             genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));

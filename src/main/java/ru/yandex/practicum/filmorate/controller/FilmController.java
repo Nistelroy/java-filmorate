@@ -28,6 +28,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     public Optional<Film> addFilm(@Valid @RequestBody Film film) {
         log.info("Создание фильма: {}", film);
+
         return filmService.addFilm(film);
     }
 
