@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -46,11 +45,11 @@ public class FilmDbStorage implements FilmStorage {
         Set<Genre> genres = film.getGenres();
         if (genres != null) {
             for (Genre genre : film.getGenres()) {
-            Optional<Genre> existingGenre = getGenreById(genre.getId());
-            if (existingGenre.isEmpty()) {
-                throw new InvalidDataException("Недействительный жанр указан для фильма: " + genre.getId());
+                Optional<Genre> existingGenre = getGenreById(genre.getId());
+                if (existingGenre.isEmpty()) {
+                    throw new InvalidDataException("Недействительный жанр указан для фильма: " + genre.getId());
+                }
             }
-        }
             genres = new HashSet<>(genres.stream().sorted(Genre::compareTo).collect(
                     Collectors.toCollection(LinkedHashSet::new)));
             genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));
