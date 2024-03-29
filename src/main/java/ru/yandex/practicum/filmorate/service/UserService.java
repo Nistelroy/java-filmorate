@@ -86,7 +86,7 @@ public class UserService {
         if (userId == friendId) {
             throw new ConflictException("Нельзя");
         }
-        else if (userStorage.userNotExist(userId)) {
+        if (userStorage.userNotExist(userId)) {
             throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден.");
         }
         if (userStorage.userNotExist(friendId)) {
