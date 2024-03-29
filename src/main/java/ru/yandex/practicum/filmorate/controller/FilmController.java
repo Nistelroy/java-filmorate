@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,9 +34,9 @@ public class FilmController {
     }
 
     @PutMapping
-    public Optional<Film> updateFilm(@Valid @RequestBody Film updatedFilm) {
-        log.info("Обновление фильма: {}", updatedFilm);
-        return filmService.updateFilm(updatedFilm);
+    public Optional<Film> updateFilm(@Valid @RequestBody Film film) {
+        log.info("Обновление фильма: {}", film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")

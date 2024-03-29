@@ -51,6 +51,7 @@ public class FilmDbStorageTest {
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .genres(genres)
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -66,6 +67,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -128,6 +130,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -159,6 +162,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -178,6 +182,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -225,6 +230,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm = filmStorage.addFilm(newFilm);
@@ -273,6 +279,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm1 = filmStorage.addFilm(newFilm1);
@@ -285,6 +292,7 @@ public class FilmDbStorageTest {
                 .description("Film description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(60)
+                .mpa(new Mpa(1, "G", "У фильма нет возрастных ограничений"))
                 .build();
 
         Optional<Film> optionalFilm2 = filmStorage.addFilm(newFilm2);

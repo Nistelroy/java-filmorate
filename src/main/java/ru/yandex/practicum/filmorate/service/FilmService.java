@@ -27,6 +27,7 @@ public class FilmService {
         if (filmStorage.filmNotExist(film.getId())) {
             throw new ObjectNotFoundException("Фильм с id " + film.getId() + " не найден.");
         }
+
         return filmStorage.updateFilm(film);
     }
 

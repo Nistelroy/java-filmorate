@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,7 +34,6 @@ public class FilmDbStorage implements FilmStorage {
         if (mpa.isEmpty()) {
             throw new InvalidDataException("Недействительный MPA указан для фильма.");
         }
-
 
         Map<String, Object> filmMap = film.toMap();
 
