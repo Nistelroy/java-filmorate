@@ -174,13 +174,14 @@ public class FilmDbStorage implements FilmStorage {
                         "   left join mpa " +
                         "   on films.mpa_id = mpa.mpa_id " +
                         "where film_id in (" +
-                        "   select top ? " +
+                        "   select " +
                         "       films.film_id " +
                         "   from films " +
                         "       left join film_likes " +
                         "       on films.film_id = film_likes.film_id " +
                         "   group by films.film_id " +
                         "   order by count(film_likes.user_id) desc" +
+                        "   LIMIT ?" +
                         ")";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
