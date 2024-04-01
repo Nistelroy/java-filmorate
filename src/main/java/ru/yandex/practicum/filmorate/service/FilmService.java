@@ -54,7 +54,7 @@ public class FilmService {
         filmStorage.getFilm(filmId).get().addLike(userId);
     }
 
-    public void unlikeFilm(int userId, int filmId) {
+    public void unlikeFilm(int filmId, int userId) {
         if (filmStorage.getFilm(filmId).isEmpty()) {
             throw new ObjectNotFoundException("Фильм с айди'" + filmId + "' не найден");
         }
