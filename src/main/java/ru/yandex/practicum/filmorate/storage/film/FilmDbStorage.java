@@ -11,13 +11,13 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -50,9 +50,17 @@ public class FilmDbStorage implements FilmStorage {
                     throw new InvalidDataException("Недействительный жанр указан для фильма: " + genre.getId());
                 }
             }
-            genres = new HashSet<>(genres.stream().sorted(Genre::compareTo).collect(
-                    Collectors.toCollection(LinkedHashSet::new)));
-            genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));
+//            genres = new HashSet<>(genres.stream().sorted(Genre::compareTo).collect(
+//                    Collectors.toCollection(LinkedHashSet::new)));
+//            genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));
+
+            List<Object[]> batchParams = new ArrayList<>();
+            for (Genre genre : genres) {
+                batchParams.add(new Object[]{filmId, genre.getId()});
+            }
+
+            String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+            int[] updateCounts = jdbcTemplate.batchUpdate(sql, batchParams);
         } else {
             genres = new HashSet<>();
         }
@@ -161,29 +169,21 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilms(int count) {
         String sqlQuery =
-                "select " +
-                        "   films.film_id, " +
-                        "   films.name, " +
-                        "   films.description, " +
-                        "   films.release_date, " +
-                        "   films.duration, " +
-                        "   films.mpa_id, " +
-                        "   mpa.name as mpa_name, " +
-                        "   mpa.description as mpa_description " +
-                        "from films " +
-                        "   left join mpa " +
-                        "   on films.mpa_id = mpa.mpa_id " +
-                        "where film_id in (" +
-                        "   select " +
-                        "       films.film_id " +
-                        "   from films " +
-                        "       left join film_likes " +
-                        "       on films.film_id = film_likes.film_id " +
-                        "   group by films.film_id " +
-                        "   order by count(film_likes.user_id) desc" +
-                        "   LIMIT ?" +
-                        ")";
-
+                "SELECT films.film_id, " +
+                        "films.name, " +
+                        "films.description, " +
+                        "films.release_date, " +
+                        "films.duration, " +
+                        "films.mpa_id, " +
+                        "mpa.name AS mpa_name, " +
+                        "mpa.description AS mpa_description, " +
+                        "COUNT(film_likes.user_id) as like_count " +
+                        "FROM films " +
+                        "LEFT JOIN mpa ON films.mpa_id = mpa.mpa_id " +
+                        "LEFT JOIN film_likes ON films.film_id = film_likes.film_id " +
+                        "GROUP BY films.film_id " +
+                        "ORDER BY like_count DESC " +
+                        "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
@@ -266,8 +266,31 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        int filmId = resultSet.getInt("film_id");
+
+        String genreSqlQuery =
+                "select " +
+                        "film_genres.genre_id as genre_id, " +
+                        "genres.name " +
+                        "from film_genres " +
+                        "left join genres " +
+                        "on film_genres.genre_id = genres.genre_id " +
+                        "where film_genres.film_id = ? " +
+                        "order by film_genres.genre_id";
+
+
+        Set<Genre> genres = new HashSet<>(jdbcTemplate.query(genreSqlQuery, this::mapRowToGenre, filmId));
+
+        String likesSqlQuery =
+                "select " +
+                        "user_id " +
+                        "from film_likes " +
+                        "where film_id = ?";
+
+        Set<Integer> likes = new HashSet<>(jdbcTemplate.queryForList(likesSqlQuery, Integer.class, filmId));
+
         return Film.builder()
-                .id(resultSet.getInt("film_id"))
+                .id(filmId)
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .duration(resultSet.getInt("duration"))
@@ -275,10 +298,11 @@ public class FilmDbStorage implements FilmStorage {
                 .mpa(new Mpa(resultSet.getInt("mpa_id"),
                         resultSet.getString("mpa_name"),
                         resultSet.getString("mpa_description")))
-                .genres(getFilmGenres(resultSet.getInt("film_id")))
-                .likes(getFilmLikes(resultSet.getInt("film_id")))
+                .genres(genres)
+                .likes(likes)
                 .build();
     }
+
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return new Genre(resultSet.getInt("genre_id"), resultSet.getString("name"));

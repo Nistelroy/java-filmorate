@@ -10,7 +10,6 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 @Builder
@@ -31,20 +30,10 @@ public class User {
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private Set<Integer> friends;
-
     public void setNameFromLogin() {
         if (name == null || name.isBlank()) {
             name = login;
         }
-    }
-
-    public void addFriend(int id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(int id) {
-        friends.remove(id);
     }
 
     public Map<String, Object> toMap() {

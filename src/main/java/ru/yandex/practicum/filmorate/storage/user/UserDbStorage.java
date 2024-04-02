@@ -5,12 +5,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,7 +44,6 @@ public class UserDbStorage implements UserStorage {
                 .email(user.getEmail())
                 .name(userName)
                 .birthday(user.getBirthday())
-                .friends(new HashSet<>())
                 .build();
 
         return Optional.of(newUser);
@@ -74,7 +73,6 @@ public class UserDbStorage implements UserStorage {
                 .email(user.getEmail())
                 .name(user.getName())
                 .birthday(user.getBirthday())
-                .friends(user.getFriends())
                 .build();
 
         return Optional.of(newUser);
@@ -82,7 +80,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> getUser(int id) {
-        return getUserById(id);
+        if (userExist(id)) {
+            return getUserById(id);
+        } else
+            throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     @Override
@@ -99,53 +100,60 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean userNotExist(int id) {
-        return !userExist(id);
-    }
-
-    @Override
     public void addFriend(int userId, int friendId) {
-        String sqlQuery = "merge into friends(user_id, friend_id, status) key(user_id, friend_id) values(?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, friendId, 0);
+        if (userExist(userId) && userExist(friendId)) {
+            String sqlQuery = "merge into friends(user_id, friend_id, status) key(user_id, friend_id) values(?, ?, ?)";
+            jdbcTemplate.update(sqlQuery, userId, friendId, 0);
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        String sqlQuery = "delete from friends where user_id = ? and friend_id = ?";
-        jdbcTemplate.update(sqlQuery, userId, friendId);
+        if (userExist(userId) && userExist(friendId)) {
+            String sqlQuery = "delete from friends where user_id = ? and friend_id = ?";
+            jdbcTemplate.update(sqlQuery, userId, friendId);
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     @Override
     public void confirmFriend(int userId, int friendId) {
-        String sqlQuery = "update friends set " +
-                "status = ? " +
-                "where user_id = ? and friend_id = ?; " +
-                "merge into friends(user_id, friend_id, status) key(user_id, friend_id) values(?, ?, ?)";
+        if (userExist(userId) && userExist(friendId)) {
+            String sqlQuery = "update friends set " +
+                    "status = ? " +
+                    "where user_id = ? and friend_id = ?; " +
+                    "merge into friends(user_id, friend_id, status) key(user_id, friend_id) values(?, ?, ?)";
 
-        jdbcTemplate.update(sqlQuery, 1, userId, friendId, friendId, userId, 1);
+            jdbcTemplate.update(sqlQuery, 1, userId, friendId, friendId, userId, 1);
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     @Override
     public Collection<User> getFriends(int id) {
-        String sqlQuery = "select * from users where user_id in (select friend_id from friends where user_id = ?)";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
+        if (userExist(id)) {
+            String sqlQuery = "select * from users where user_id in (select friend_id from friends where user_id = ?)";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     @Override
     public Collection<User> getCommonFriends(int id, int otherId) {
-        String sqlQuery = "select * from users where user_id in (" +
-                "select friends.friend_id from friends as friends " +
-                "inner join friends as other_friends " +
-                "on friends.friend_id = other_friends.friend_id "  +
-                "where  friends.user_id = ? and other_friends.user_id = ?" +
-                ")";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId);
+        if (userExist(id) && userExist(otherId)) {
+            String sqlQuery = "select * from users where user_id in (" +
+                    "select friends.friend_id from friends as friends " +
+                    "inner join friends as other_friends " +
+                    "on friends.friend_id = other_friends.friend_id " +
+                    "where  friends.user_id = ? and other_friends.user_id = ?" +
+                    ")";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId);
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     private Optional<User> getUserById(int id) {
-        String sqlQuery = "select * from users where user_id = ?";
-        Collection<User> users =  jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
-        return users.stream().findFirst();
+        if (userExist(id)) {
+            String sqlQuery = "select * from users where user_id = ?";
+            Collection<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
+            return users.stream().findFirst();
+        } else throw new ObjectNotFoundException("Пользователь не найден в базе данных");
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
@@ -155,8 +163,6 @@ public class UserDbStorage implements UserStorage {
                 .email(resultSet.getString("email"))
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friends(new HashSet<>())
                 .build();
     }
-
 }

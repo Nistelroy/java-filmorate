@@ -19,24 +19,25 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public Optional<Film> addFilm(Film film) {
-        return filmStorage.addFilm(film);
+    public Film addFilm(Film film) {
+
+        return filmStorage.addFilm(film).get();
     }
 
-    public Optional<Film> updateFilm(Film film) {
+    public Film updateFilm(Film film) {
         if (filmStorage.filmNotExist(film.getId())) {
             throw new ObjectNotFoundException("Фильм с id " + film.getId() + " не найден.");
         }
 
-        return filmStorage.updateFilm(film);
+        return filmStorage.updateFilm(film).get();
     }
 
-    public Optional<Film> getFilm(int filmId) {
+    public Film getFilm(int filmId) {
         Optional<Film> foundFilm = filmStorage.getFilm(filmId);
         if (foundFilm.isEmpty()) {
             throw new ObjectNotFoundException("Фильм с id " + filmId + " не найден.");
         }
-        return foundFilm;
+        return foundFilm.get();
     }
 
     public Collection<Film> getAllFilms() {
@@ -65,23 +66,23 @@ public class FilmService {
         return filmStorage.getAllMpa();
     }
 
-    public Optional<Mpa> getMpaById(int id) {
+    public Mpa getMpaById(int id) {
         Optional<Mpa> mpa = filmStorage.getMpaById(id);
         if (mpa.isEmpty()) {
             throw new ObjectNotFoundException("Рейтинга с id " + id + " не существует.");
         }
-        return mpa;
+        return mpa.get();
     }
 
     public Collection<Genre> getAllGenres() {
         return filmStorage.getAllGenres();
     }
 
-    public Optional<Genre> getGenreById(int id) {
+    public Genre getGenreById(int id) {
         Optional<Genre> genre = filmStorage.getGenreById(id);
         if (genre.isEmpty()) {
             throw new ObjectNotFoundException("Жанра с id " + id + " не существует.");
         }
-        return genre;
+        return genre.get();
     }
 }

@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -34,13 +33,13 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Optional<User> createUser(@Valid @RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         log.info("Создание пользователя: {}", user);
         return userService.createUser(user);
     }
 
     @PutMapping
-    public Optional<User> updateUser(@Valid @RequestBody User updatedUser) {
+    public User updateUser(@Valid @RequestBody User updatedUser) {
         log.info("Обновление пользователя: {}", updatedUser);
         return userService.updateUser(updatedUser);
     }
@@ -52,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getUser(@PathVariable int id) {
+    public User getUser(@PathVariable int id) {
         return userService.getUser(id);
     }
 

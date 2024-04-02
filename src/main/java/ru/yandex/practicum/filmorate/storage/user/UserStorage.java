@@ -16,8 +16,6 @@ public interface UserStorage {
 
     boolean userExist(int id);
 
-    boolean userNotExist(int id);
-
     void addFriend(int userId, int friendId);
 
     void removeFriend(int userId, int friendId);

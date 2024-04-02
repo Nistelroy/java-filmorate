@@ -47,7 +47,10 @@ public class Film {
     }
 
     public Integer getMpaId() {
-        return (mpa == null ? null : mpa.getId());
+        if (mpa == null) {
+            throw new IllegalStateException("Мпа не может быть пустым для фильма.");
+        }
+        return mpa.getId();
     }
 
     public Map<String, Object> toMap() {

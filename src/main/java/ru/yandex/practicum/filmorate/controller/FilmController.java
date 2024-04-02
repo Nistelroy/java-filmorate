@@ -11,7 +11,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -26,14 +25,14 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Optional<Film> addFilm(@Valid @RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) {
         log.info("Создание фильма: {}", film);
 
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Optional<Film> updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Обновление фильма: {}", film);
         return filmService.updateFilm(film);
     }
@@ -45,7 +44,7 @@ public class FilmController {
 
 
     @GetMapping("/{id}")
-    public Optional<Film> getFilm(@PathVariable int id) {
+    public Film getFilm(@PathVariable int id) {
         return filmService.getFilm(id);
     }
 
