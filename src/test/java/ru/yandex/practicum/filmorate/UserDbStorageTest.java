@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -126,11 +128,11 @@ class UserDbStorageTest {
 
     @Test
     public void testGetUserWithWrongId() {
-        Optional<User> getUserOptional = userStorage.getUser(555);
-
-        assertThat(getUserOptional)
-                .isEmpty();
+        assertThrows(ObjectNotFoundException.class, () -> {
+            userStorage.getUser(555);
+        });
     }
+
 
     @Test
     public void testGetUsers() {

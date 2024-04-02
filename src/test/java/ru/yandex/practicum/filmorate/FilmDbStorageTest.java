@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -121,11 +122,11 @@ public class FilmDbStorageTest {
                 .duration(60)
                 .build();
 
-        Optional<Film> optionalFilm = filmStorage.updateFilm(newFilm);
-
-        assertThat(optionalFilm)
-                .isEmpty();
+        assertThrows(IllegalStateException.class, () -> {
+            filmStorage.updateFilm(newFilm);
+        });
     }
+
 
     @Test
     public void testGetFilm() {
@@ -333,7 +334,7 @@ public class FilmDbStorageTest {
         filmStorage.addLike(optionalFilm2.get().getId(), userOptional1.get().getId());
 
         Collection<Film> films = filmStorage.getPopularFilms(2);
-        List<Film> listFilms = (List<Film>)films;
+        List<Film> listFilms = (List<Film>) films;
 
         assertThat(films)
                 .isNotEmpty()
