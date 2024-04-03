@@ -50,9 +50,6 @@ public class FilmDbStorage implements FilmStorage {
                     throw new InvalidDataException("Недействительный жанр указан для фильма: " + genre.getId());
                 }
             }
-//            genres = new HashSet<>(genres.stream().sorted(Genre::compareTo).collect(
-//                    Collectors.toCollection(LinkedHashSet::new)));
-//            genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));
 
             List<Object[]> batchParams = new ArrayList<>();
             for (Genre genre : genres) {
