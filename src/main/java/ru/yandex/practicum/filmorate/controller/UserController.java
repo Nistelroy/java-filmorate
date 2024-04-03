@@ -39,15 +39,9 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User updatedUser) {
+    public User updateUser(@Valid @RequestBody User updatedUser) {
         log.info("Обновление пользователя: {}", updatedUser);
         return userService.updateUser(updatedUser);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable int id) {
-        log.info("Удаление пользователя с ID: {}", id);
-        userService.deleteUser(id);
     }
 
     @GetMapping
@@ -58,7 +52,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable int id) {
-        return userService.getUserById(id);
+        return userService.getUser(id);
     }
 
     @GetMapping("/{id}/friends")
@@ -69,6 +63,11 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);
+    }
+
+    @PutMapping("/{id}/friends/confirm/{friendId}")
+    public void confirmFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.confirmFriend(id, friendId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

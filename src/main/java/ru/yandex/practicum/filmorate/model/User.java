@@ -8,8 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -30,20 +30,19 @@ public class User {
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private final Set<Integer> friends = new HashSet<>();
-
     public void setNameFromLogin() {
         if (name == null || name.isBlank()) {
             name = login;
         }
     }
 
-    public void addFriend(int id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(int id) {
-        friends.remove(id);
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", email);
+        values.put("login", login);
+        values.put("name", name);
+        values.put("birthday", birthday);
+        return values;
     }
 
 }

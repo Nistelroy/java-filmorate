@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -30,9 +31,9 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film updatedFilm) {
-        log.info("Обновление фильма: {}", updatedFilm);
-        return filmService.updateFilm(updatedFilm);
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.info("Обновление фильма: {}", film);
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -40,24 +41,19 @@ public class FilmController {
         filmService.likeFilm(id, userId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteFilm(@PathVariable int id) {
-        log.info("Удаление фильма с ID: {}", id);
-        filmService.deleteFilmById(id);
-    }
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
-        return filmService.getFilmById(id);
+        return filmService.getFilm(id);
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopularFilm(count);
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<Film> getFilms() {
         log.info("Запрос всех фильмов");
         return new ArrayList<>(filmService.getAllFilms());
     }

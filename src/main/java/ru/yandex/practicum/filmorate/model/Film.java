@@ -9,7 +9,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -24,6 +25,8 @@ public class Film {
     @Size(max = 200, message = "максимальная длина описания — 200 символов")
     private String description;
 
+    private Mpa mpa;
+
     @ValidReleaseDate
     @NotNull
     private LocalDate releaseDate;
@@ -31,7 +34,9 @@ public class Film {
     @Positive(message = "продолжительность фильма должна быть положительной.")
     private int duration;
 
-    private final Set<Integer> likes = new HashSet<>();
+    private Set<Integer> likes;
+
+    private Set<Genre> genres;
 
     public void addLike(int userId) {
         likes.add(userId);
@@ -39,5 +44,22 @@ public class Film {
 
     public void removeLike(int userId) {
         likes.remove(userId);
+    }
+
+    public Integer getMpaId() {
+        if (mpa == null) {
+            throw new IllegalStateException("Мпа не может быть пустым для фильма.");
+        }
+        return mpa.getId();
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", name);
+        values.put("description", description);
+        values.put("release_date", releaseDate);
+        values.put("duration", duration);
+        values.put("mpa_id", getMpaId());
+        return values;
     }
 }
